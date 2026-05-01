@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Ejercicio · macy.eg</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0d0a12;
+  --bg2:       #130f1c;
+  --bg3:       #1a1428;
+  --lila:      #c084fc;
+  --lila-dark: #7c3aed;
+  --lila-mid:  #a855f7;
+  --lila-pale: #e9d5ff;
+  --lila-glow: rgba(192,132,252,0.18);
+  --pink:      #f472b6;
+  --pink-pale: #fce7f3;
+  --yellow:    #fde68a;
+  --white:     #faf5ff;
+  --gray:      #a78bbc;
+  --border:    rgba(192,132,252,0.2);
+  --card:      rgba(26,20,40,0.8);
+  --card2:     rgba(35,28,55,0.9);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.35;
+}
+
+/* ── AMBIENT GLOWS ── */
+.glow-1 {
+  position: fixed; top: -20vh; left: -10vw;
+  width: 60vw; height: 60vh; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(124,58,237,0.15) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+.glow-2 {
+  position: fixed; bottom: -20vh; right: -10vw;
+  width: 50vw; height: 50vh; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(244,114,182,0.1) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+.glow-3 {
+  position: fixed; top: 40vh; right: 20vw;
+  width: 30vw; height: 30vh; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(192,132,252,0.08) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 10;
+  padding: 5rem 2rem 3rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.label-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.15em;
+  color: var(--lila); text-transform: uppercase;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.8s ease both;
+}
+
+.label-tag .blink {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--pink); animation: blink 1.5s infinite;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  animation: fadeUp 0.8s 0.1s ease both;
+}
+
+h1 .italic { font-style: italic; color: var(--lila); }
+h1 .pink   { color: var(--pink); }
+
+.header-sub {
+  margin-top: 1.2rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem; color: var(--gray);
+  animation: fadeUp 0.8s 0.2s ease both;
+}
+
+/* ── NAV PILLS ── */
+.sticky-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(13,10,18,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.8rem 2rem;
+  display: flex; gap: 0.5rem; overflow-x: auto;
+  scrollbar-width: none;
+  animation: fadeUp 0.8s 0.3s ease both;
+}
+.sticky-nav::-webkit-scrollbar { display: none; }
+
+.nav-pill {
+  flex-shrink: 0;
+  padding: 8px 18px; border-radius: 100px;
+  border: 1px solid var(--border);
+  background: transparent; cursor: pointer;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; color: var(--gray);
+  letter-spacing: 0.05em; text-decoration: none;
+  transition: all 0.2s ease; white-space: nowrap;
+}
+.nav-pill:hover, .nav-pill.active {
+  background: var(--lila-glow);
+  border-color: var(--lila);
+  color: var(--lila-pale);
+}
+
+/* ── LAYOUT ── */
+main {
+  position: relative; z-index: 10;
+  max-width: 900px; margin: 0 auto;
+  padding: 3rem 2rem;
+  display: flex; flex-direction: column; gap: 4rem;
+}
+
+/* ── SECTION HEADERS ── */
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.2em;
+  color: var(--lila); text-transform: uppercase;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 700; line-height: 1.1;
+  margin-bottom: 1rem;
+}
+.section-title em { font-style: italic; color: var(--lila); }
+.section-title .pink { color: var(--pink); }
+
+.section-desc {
+  color: var(--gray); font-size: 0.9rem;
+  line-height: 1.7; margin-bottom: 2rem;
+  max-width: 680px;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  border-color: rgba(192,132,252,0.4);
+  box-shadow: 0 0 40px rgba(192,132,252,0.08);
+}
+
+/* ── RPE SCALE ── */
+.rpe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem; margin-top: 1.5rem;
+}
+
+.rpe-card {
+  border-radius: 16px; padding: 1.2rem;
+  border: 1px solid transparent;
+  position: relative; overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.rpe-card:hover { transform: translateY(-2px); }
+
+.rpe-card::before {
+  content: ''; position: absolute;
+  inset: 0; opacity: 0.06; border-radius: inherit;
+}
+
+.rpe-1-2  { background: rgba(74,222,128,0.06); border-color: rgba(74,222,128,0.2); }
+.rpe-1-2::before { background: #4ade80; }
+.rpe-3-4  { background: rgba(163,230,53,0.06); border-color: rgba(163,230,53,0.2); }
+.rpe-3-4::before { background: #a3e635; }
+.rpe-5-6  { background: rgba(250,204,21,0.06); border-color: rgba(250,204,21,0.2); }
+.rpe-5-6::before { background: #facc15; }
+.rpe-7-8  { background: rgba(251,146,60,0.06); border-color: rgba(251,146,60,0.2); }
+.rpe-7-8::before { background: #fb923c; }
+.rpe-9-10 { background: rgba(248,113,113,0.06); border-color: rgba(248,113,113,0.2); }
+.rpe-9-10 ::before{ background: #f87171; }
+
+.rpe-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; font-weight: 900;
+  line-height: 1; margin-bottom: 4px;
+}
+.rpe-label { font-size: 0.78rem; font-weight: 600; margin-bottom: 6px; }
+.rpe-desc { font-size: 0.73rem; color: var(--gray); line-height: 1.5; }
+.rpe-test { font-size: 0.68rem; margin-top: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(255,255,255,0.04); font-style: italic; color: var(--lila-pale); }
+
+/* ── FC ZONES ── */
+.fc-visual {
+  margin: 1.5rem 0;
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+
+.fc-zone {
+  display: grid; grid-template-columns: 80px 1fr auto;
+  align-items: center; gap: 1rem;
+  padding: 0.8rem 1rem; border-radius: 12px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+.fc-zone:hover { transform: translateX(4px); }
+
+.fc-zone-z1 { background: rgba(74,222,128,0.07); border-color: rgba(74,222,128,0.2); }
+.fc-zone-z2 { background: rgba(192,132,252,0.1); border-color: rgba(192,132,252,0.35); box-shadow: 0 0 20px rgba(192,132,252,0.08); }
+.fc-zone-z3 { background: rgba(250,204,21,0.07); border-color: rgba(250,204,21,0.2); }
+.fc-zone-z4 { background: rgba(251,146,60,0.07); border-color: rgba(251,146,60,0.2); }
+.fc-zone-z5 { background: rgba(248,113,113,0.07); border-color: rgba(248,113,113,0.2); }
+
+.fc-zone-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.1em;
+  color: var(--gray); text-transform: uppercase;
+}
+.fc-zone-name { font-size: 0.82rem; font-weight: 500; }
+.fc-zone-detail { font-size: 0.7rem; color: var(--gray); line-height: 1.4; }
+.fc-zone-bpm {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem; text-align: right;
+  white-space: nowrap;
+}
+
+.fc-tag {
+  display: inline-block; margin-left: 6px;
+  font-size: 0.6rem; padding: 2px 8px;
+  border-radius: 100px; background: var(--lila-glow);
+  color: var(--lila); border: 1px solid var(--border);
+  vertical-align: middle; font-family: 'DM Mono', monospace;
+  letter-spacing: 0.05em;
+}
+
+.formula-box {
+  background: rgba(192,132,252,0.07);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.2rem 1.5rem;
+  margin: 1.5rem 0;
+  display: flex; align-items: center; gap: 1rem;
+  flex-wrap: wrap;
+}
+.formula-box .formula {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.95rem; color: var(--lila-pale);
+}
+.formula-box .formula span { color: var(--pink); }
+.formula-box .formula-note { font-size: 0.72rem; color: var(--gray); margin-top: 4px; }
+.macy-calc {
+  margin-left: auto;
+  text-align: right;
+}
+.macy-calc .calc-result {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 700; color: var(--lila);
+}
+.macy-calc .calc-label { font-size: 0.68rem; color: var(--gray); font-family: 'DM Mono', monospace; }
+
+/* ── ROUTINE BLOCKS ── */
+.routine-section {
+  border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+}
+
+.routine-header {
+  padding: 1.2rem 1.5rem;
+  background: linear-gradient(135deg, rgba(192,132,252,0.12), rgba(124,58,237,0.06));
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.routine-header:hover { background: linear-gradient(135deg, rgba(192,132,252,0.18), rgba(124,58,237,0.1)); }
+
+.routine-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+.icon-fuerza { background: rgba(192,132,252,0.15); }
+.icon-cardio { background: rgba(96,165,250,0.15); }
+.icon-yoga   { background: rgba(244,114,182,0.15); }
+.icon-pausa  { background: rgba(250,204,21,0.12); }
+.icon-estiramiento { background: rgba(74,222,128,0.12); }
+
+.routine-header-text h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem; font-weight: 700;
+}
+.routine-header-text p {
+  font-size: 0.73rem; color: var(--gray); margin-top: 2px;
+  font-family: 'DM Mono', monospace;
+}
+
+.chevron {
+  margin-left: auto; font-size: 1rem; color: var(--lila);
+  transition: transform 0.3s ease;
+}
+.routine-section.open .chevron { transform: rotate(180deg); }
+
+.routine-body {
+  display: none; padding: 0;
+}
+.routine-section.open .routine-body { display: block; }
+
+/* ── EXERCISE LIST ── */
+.exercise-list {
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.exercise-item {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: start; gap: 1rem;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid rgba(192,132,252,0.08);
+  transition: background 0.15s;
+}
+.exercise-item:last-child { border-bottom: none; }
+.exercise-item:hover { background: rgba(192,132,252,0.04); }
+
+.ex-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem; font-weight: 900;
+  color: rgba(192,132,252,0.3); line-height: 1;
+}
+
+.ex-content {}
+.ex-name {
+  font-size: 0.9rem; font-weight: 600;
+  color: var(--white); margin-bottom: 4px;
+}
+.ex-muscles {
+  font-size: 0.68rem; color: var(--lila);
+  font-family: 'DM Mono', monospace; margin-bottom: 6px;
+}
+.ex-how { font-size: 0.78rem; color: var(--gray); line-height: 1.55; }
+
+.ex-tip {
+  font-size: 0.68rem; color: var(--pink);
+  background: rgba(244,114,182,0.07);
+  border: 1px solid rgba(244,114,182,0.15);
+  border-radius: 8px; padding: 5px 10px;
+  margin-top: 6px; display: inline-block;
+  font-style: italic;
+}
+
+.ex-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem; text-align: right;
+  color: var(--lila-pale); white-space: nowrap;
+  line-height: 1.6;
+}
+.ex-badge strong { display: block; color: var(--lila); font-size: 0.8rem; }
+
+/* ── FC/RPE MINI BADGE ── */
+.mini-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 100px;
+  font-size: 0.65rem; font-family: 'DM Mono', monospace;
+  border: 1px solid;
+}
+.mb-rpe { background: rgba(250,204,21,0.08); border-color: rgba(250,204,21,0.2); color: #fde68a; }
+.mb-fc  { background: rgba(192,132,252,0.08); border-color: rgba(192,132,252,0.2); color: var(--lila-pale); }
+.mb-dur { background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.2); color: #86efac; }
+
+.badges-row { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+
+/* ── PROTOCOL BLOCKS ── */
+.protocol-block {
+  background: var(--card2); border-radius: 14px;
+  padding: 1.2rem 1.5rem; margin: 1rem 1.5rem;
+  border-left: 3px solid var(--lila);
+}
+.protocol-title {
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--lila); margin-bottom: 0.7rem;
+}
+.protocol-steps { display: flex; flex-direction: column; gap: 0.4rem; }
+.protocol-step {
+  display: flex; gap: 0.8rem; align-items: flex-start;
+  font-size: 0.8rem; color: var(--gray); line-height: 1.5;
+}
+.step-time {
+  font-family: 'DM Mono', monospace; font-size: 0.72rem;
+  color: var(--lila-pale); min-width: 55px; padding-top: 1px;
+}
+
+/* ── PAUSA ACTIVA CARDS ── */
+.pausa-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem; padding: 1.5rem;
+}
+
+.pausa-card {
+  background: rgba(192,132,252,0.05);
+  border: 1px solid rgba(192,132,252,0.15);
+  border-radius: 14px; padding: 1.1rem;
+  transition: all 0.2s;
+}
+.pausa-card:hover {
+  border-color: rgba(192,132,252,0.35);
+  background: rgba(192,132,252,0.1);
+  transform: translateY(-2px);
+}
+.pausa-card .pc-icon { font-size: 1.5rem; margin-bottom: 8px; }
+.pausa-card .pc-name { font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; }
+.pausa-card .pc-time { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--lila); margin-bottom: 8px; }
+.pausa-card .pc-steps { font-size: 0.73rem; color: var(--gray); line-height: 1.55; }
+
+/* ── SOLEUS BOX ── */
+.soleus-box {
+  margin: 0 1.5rem 1.5rem;
+  background: linear-gradient(135deg, rgba(244,114,182,0.07), rgba(192,132,252,0.05));
+  border: 1px solid rgba(244,114,182,0.2);
+  border-radius: 16px; padding: 1.3rem;
+  display: flex; gap: 1rem; align-items: flex-start; flex-wrap: wrap;
+}
+.soleus-box .sb-icon { font-size: 2rem; }
+.soleus-box .sb-content {}
+.soleus-box .sb-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--pink); }
+.soleus-box .sb-text { font-size: 0.78rem; color: var(--gray); line-height: 1.6; }
+.soleus-box .sb-how { font-size: 0.75rem; color: var(--lila-pale); margin-top: 8px; }
+
+/* ── STRETCHING ── */
+.stretch-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.8rem; padding: 1.5rem;
+}
+.stretch-card {
+  border-radius: 14px; padding: 1.1rem;
+  border: 1px solid var(--border); background: var(--card);
+  transition: all 0.2s;
+}
+.stretch-card:hover { border-color: rgba(192,132,252,0.3); transform: translateY(-2px); }
+.sc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.sc-icon { font-size: 1.3rem; }
+.sc-name { font-size: 0.85rem; font-weight: 600; }
+.sc-zone { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--lila); }
+.sc-steps { font-size: 0.73rem; color: var(--gray); line-height: 1.55; }
+.sc-time { font-family: 'DM Mono', monospace; font-size: 0.63rem; color: var(--pink); margin-top: 6px; }
+
+/* ── GLOSSARY ── */
+.glossary-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.8rem;
+}
+.gloss-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.2rem;
+  transition: all 0.2s;
+}
+.gloss-card:hover { border-color: rgba(192,132,252,0.4); }
+.gloss-term {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--lila); margin-bottom: 6px;
+}
+.gloss-def { font-size: 0.78rem; color: var(--gray); line-height: 1.6; }
+.gloss-example {
+  margin-top: 8px; font-size: 0.72rem;
+  color: var(--pink); font-style: italic;
+  padding: 5px 10px; background: rgba(244,114,182,0.05);
+  border-radius: 8px; border: 1px solid rgba(244,114,182,0.12);
+}
+
+/* ── WEEKLY VISUAL ── */
+.week-visual {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.4rem;
+}
+.wv-day {
+  text-align: center; border-radius: 12px; padding: 0.8rem 0.3rem;
+  border: 1px solid var(--border);
+  transition: all 0.2s; cursor: default;
+}
+.wv-day:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(192,132,252,0.1); }
+.wv-label { font-family: 'DM Mono', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray); margin-bottom: 8px; }
+.wv-icon { font-size: 1.4rem; margin-bottom: 6px; }
+.wv-type { font-size: 0.62rem; font-weight: 600; }
+.wv-dur  { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--gray); margin-top: 3px; }
+
+.wv-fuerza { background: rgba(192,132,252,0.1); border-color: rgba(192,132,252,0.3); }
+.wv-cardio { background: rgba(96,165,250,0.08); border-color: rgba(96,165,250,0.25); }
+.wv-yoga   { background: rgba(244,114,182,0.08); border-color: rgba(244,114,182,0.25); }
+.wv-hiking { background: rgba(250,204,21,0.06); border-color: rgba(250,204,21,0.2); }
+.wv-rest   { background: rgba(138,126,120,0.06); border-color: rgba(138,126,120,0.15); }
+
+/* ── CAMINADORA PROTOCOL ── */
+.caminadora-steps {
+  display: flex; flex-direction: column; gap: 0;
+  margin: 0 1.5rem 1.5rem;
+}
+.cam-step {
+  display: flex; align-items: stretch; gap: 1rem;
+}
+.cam-step-line {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 40px;
+}
+.cam-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--lila); background: var(--bg);
+  flex-shrink: 0; position: relative; z-index: 1;
+}
+.cam-dot.active { background: var(--lila); box-shadow: 0 0 12px rgba(192,132,252,0.5); }
+.cam-line {
+  width: 2px; flex: 1;
+  background: linear-gradient(to bottom, var(--lila), rgba(192,132,252,0.1));
+  margin: 4px 0;
+}
+.cam-step:last-child .cam-line { display: none; }
+.cam-content {
+  padding: 0 0 1.2rem; flex: 1;
+}
+.cam-time { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--lila); margin-bottom: 3px; }
+.cam-label { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; }
+.cam-detail { font-size: 0.75rem; color: var(--gray); line-height: 1.5; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ── INFOBOX ── */
+.infobox {
+  background: rgba(192,132,252,0.06);
+  border: 1px solid rgba(192,132,252,0.2);
+  border-radius: 14px; padding: 1rem 1.2rem;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.infobox .ib-icon { font-size: 1.1rem; margin-top: 1px; flex-shrink: 0; }
+.infobox .ib-text { font-size: 0.78rem; color: var(--gray); line-height: 1.6; }
+.infobox .ib-text strong { color: var(--lila-pale); }
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px; width: 100%;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 1rem 0;
+}
+
+/* ── FOOTER ── */
+footer {
+  position: relative; z-index: 10;
+  text-align: center; padding: 3rem 2rem;
+  border-top: 1px solid var(--border);
+  font-family: 'DM Mono', monospace; font-size: 0.68rem;
+  color: var(--gray); letter-spacing: 0.1em;
+}
+footer .ft-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 700; font-style: italic;
+  color: var(--lila); margin-bottom: 0.5rem;
+}
+
+/* ── SCROLL TO TOP ── */
+.fab {
+  position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--lila-dark), var(--lila-mid));
+  color: white; border: none; cursor: pointer; font-size: 1rem;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.25s ease;
+}
+.fab:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 30px rgba(124,58,237,0.5); }
+
+/* ── BACK LINK ── */
+.back-bar {
+  position: relative; z-index: 10;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: 'DM Mono', monospace; font-size: 0.7rem;
+  color: var(--gray);
+}
+.back-bar .back-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--lila); }
+
+@media (max-width: 640px) {
+  header { padding: 3rem 1rem 2rem; }
+  main { padding: 2rem 1rem; }
+  .week-visual { grid-template-columns: repeat(4, 1fr); }
+  .rpe-grid { grid-template-columns: 1fr; }
+  .pausa-grid { grid-template-columns: 1fr; }
+  .stretch-grid { grid-template-columns: 1fr; }
+  .exercise-item { grid-template-columns: 2rem 1fr; }
+  .ex-badge { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+<div class="glow-3"></div>
+
+<!-- BACK BAR -->
+<div class="back-bar">
+  <div class="back-dot"></div>
+  <span>macy.eg · Plan Mes 1</span>
+  <span style="margin-left:auto;color:var(--lila)">Guía de Ejercicio</span>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="label-tag"><span class="blink"></span> Guía técnica · Mes 1</div>
+  <h1>todo lo que necesitas<br>saber para <span class="italic">moverte</span><br>con <span class="pink">intención</span></h1>
+  <p class="header-sub">// RPE · Zonas FC · Rutinas completas · Estiramientos · Pausas activas</p>
+</header>
+
+<!-- NAV -->
+<nav class="sticky-nav">
+  <a class="nav-pill" href="#semana-tipo">Semana tipo</a>
+  <a class="nav-pill" href="#glosario">RPE y FC</a>
+  <a class="nav-pill" href="#fuerza-a">Fuerza A</a>
+  <a class="nav-pill" href="#fuerza-b">Fuerza B</a>
+  <a class="nav-pill" href="#cardio-z2">Cardio Z2</a>
+  <a class="nav-pill" href="#caminadora">Protocolo Caminadora</a>
+  <a class="nav-pill" href="#yoga-pilates">Yoga & Pilates</a>
+  <a class="nav-pill" href="#activacion">Activación</a>
+  <a class="nav-pill" href="#estiramientos">Estiramientos</a>
+  <a class="nav-pill" href="#pausas">Pausas activas</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════ SEMANA TIPO -->
+<section id="semana-tipo">
+  <div class="section-label">01 · estructura</div>
+  <h2 class="section-title">Tu semana <em>tipo</em></h2>
+  <p class="section-desc">Lunes a viernes en la mañana, más sábado de hiking y domingo de descanso activo. Cada día tiene un propósito distinto para que tu cuerpo se adapte sin sobreentrenarte.</p>
+
+  <div class="week-visual">
+    <div class="wv-day wv-fuerza">
+      <div class="wv-label">Lun</div>
+      <div class="wv-icon">💪</div>
+      <div class="wv-type" style="color:#c084fc">Fuerza A</div>
+      <div class="wv-dur">45 min</div>
+    </div>
+    <div class="wv-day wv-cardio">
+      <div class="wv-label">Mar</div>
+      <div class="wv-icon">🏃‍♀️</div>
+      <div class="wv-type" style="color:#60a5fa">Cardio Z2</div>
+      <div class="wv-dur">40-45 min</div>
+    </div>
+    <div class="wv-day wv-fuerza">
+      <div class="wv-label">Mié</div>
+      <div class="wv-icon">💪</div>
+      <div class="wv-type" style="color:#c084fc">Fuerza B</div>
+      <div class="wv-dur">45 min</div>
+    </div>
+    <div class="wv-day wv-yoga">
+      <div class="wv-label">Jue</div>
+      <div class="wv-icon">🧘‍♀️</div>
+      <div class="wv-type" style="color:#f472b6">Yoga/Pilates</div>
+      <div class="wv-dur">35-40 min</div>
+    </div>
+    <div class="wv-day wv-cardio">
+      <div class="wv-label">Vie</div>
+      <div class="wv-icon">🏃‍♀️</div>
+      <div class="wv-type" style="color:#60a5fa">Cardio Z2</div>
+      <div class="wv-dur">45-50 min</div>
+    </div>
+    <div class="wv-day wv-hiking">
+      <div class="wv-label">Sáb</div>
+      <div class="wv-icon">🥾</div>
+      <div class="wv-type" style="color:#fde68a">Hiking</div>
+      <div class="wv-dur">60-80 min</div>
+    </div>
+    <div class="wv-day wv-rest">
+      <div class="wv-label">Dom</div>
+      <div class="wv-icon">🌿</div>
+      <div class="wv-type" style="color:#a78bbc">Descanso</div>
+      <div class="wv-dur">activo</div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.2rem" class="infobox">
+    <span class="ib-icon">💡</span>
+    <div class="ib-text">Cada sesión de fuerza y cardio empieza con <strong>5 min de activación</strong> y termina con <strong>5-10 min de estiramiento</strong>. No los saltees — son donde el cuerpo se recupera y el músculo se construye.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ GLOSARIO RPE/FC -->
+<section id="glosario">
+  <div class="section-label">02 · glosario</div>
+  <h2 class="section-title">¿Qué es <em>RPE</em> y <em>FC</em>?</h2>
+  <p class="section-desc">Dos formas de medir la intensidad de tu entrenamiento. Una es subjetiva (cómo te sientes), la otra objetiva (lo que mide tu corazón). Juntas te dicen exactamente si estás en la zona correcta.</p>
+
+  <div class="glossary-grid">
+    <div class="gloss-card">
+      <div class="gloss-term">RPE</div>
+      <div class="gloss-def"><strong style="color:var(--lila-pale)">Escala de Esfuerzo Percibido</strong> (Rate of Perceived Exertion). Es una escala del 1 al 10 donde tú calificas subjetivamente qué tan difícil se siente el ejercicio en este momento. No necesitas aparatos — solo escuchar tu cuerpo.</div>
+      <div class="gloss-example">Si te sientes al 6/10 → estás trabajando bien sin matarte. Si llegas a 9/10 → casi no puedes hablar.</div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-term">FC</div>
+      <div class="gloss-def"><strong style="color:var(--lila-pale)">Frecuencia Cardíaca</strong> (latidos por minuto). Tu corazón bombea más rápido al ejercitarte — medir esa velocidad te dice exactamente en qué zona de intensidad estás entrenando. Puedes medirla con reloj/banda, o contando 15 seg × 4.</div>
+      <div class="gloss-example">Tu FCmáx ≈ 190 lpm (190 = 220 - 30 años). Tu Zona 2 = 114-133 lpm.</div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-term">1RM</div>
+      <div class="gloss-def"><strong style="color:var(--lila-pale)">Repetición Máxima</strong>. El máximo peso que puedes levantar 1 sola vez con técnica perfecta. En tu caso trabajarás al 60-70% de ese máximo — equivale a poder hacer 12-15 repeticiones antes de "fallar".</div>
+      <div class="gloss-example">Si tu 1RM en sentadilla es 30kg → entrenas con 18-21 kg (polainas + peso corporal).</div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-term">HIIT</div>
+      <div class="gloss-def"><strong style="color:var(--lila-pale)">Entrenamiento Interválico de Alta Intensidad</strong>. Alternancia de esfuerzo máximo con recuperación. <strong style="color:var(--pink)">No entra hasta el Mes 2</strong> — primero construyes la base aeróbica y reduces inflamación.</div>
+      <div class="gloss-example">Mes 2: 8 ciclos de 1 min al 80% FC + 2 min descanso = 24 min de poder.</div>
+    </div>
+  </div>
+
+  <!-- RPE SCALE -->
+  <div style="margin-top:2rem">
+    <div class="section-label" style="margin-bottom:1rem">Escala RPE completa</div>
+    <div class="rpe-grid">
+      <div class="rpe-card rpe-1-2">
+        <div class="rpe-num" style="color:#4ade80">1–2</div>
+        <div class="rpe-label" style="color:#86efac">Casi nada</div>
+        <div class="rpe-desc">Puedes mantener esto horas. Caminar suave, estirar. No es entrenamiento — es movimiento.</div>
+        <div class="rpe-test">Test: puedes cantar sin problemas ♪</div>
+      </div>
+      <div class="rpe-card rpe-3-4">
+        <div class="rpe-num" style="color:#a3e635">3–4</div>
+        <div class="rpe-label" style="color:#bef264">Ligero / Calentamiento</div>
+        <div class="rpe-desc">Respiración un poco más rápida. Cómodo pero presente. Ideal para activación y calentamiento.</div>
+        <div class="rpe-test">Test: conversas normalmente, notas el ejercicio</div>
+      </div>
+      <div class="rpe-card rpe-5-6">
+        <div class="rpe-num" style="color:#facc15">5–6</div>
+        <div class="rpe-label" style="color:#fde68a">Moderado ← tu zona Mes 1</div>
+        <div class="rpe-desc">Sientes el esfuerzo, la respiración sube. Puedes hablar oraciones completas pero no sin pausar. <strong style="color:#fde68a">Aquí vives en las primeras 4 semanas.</strong></div>
+        <div class="rpe-test">Test: puedes hablar, pero prefieres no hacerlo</div>
+      </div>
+      <div class="rpe-card rpe-7-8">
+        <div class="rpe-num" style="color:#fb923c">7–8</div>
+        <div class="rpe-label" style="color:#fed7aa">Difícil / Mes 2-3</div>
+        <div class="rpe-desc">Respiración entrecortada. Hablas en palabras sueltas, no oraciones. Esta zona maximiza el metabolismo y la fuerza. Entra en semanas 3-4.</div>
+        <div class="rpe-test">Test: puedes decir "estoy bien" pero nada más</div>
+      </div>
+      <div class="rpe-card rpe-9-10">
+        <div class="rpe-num" style="color:#f87171">9–10</div>
+        <div class="rpe-label" style="color:#fca5a5">Máximo / HIIT</div>
+        <div class="rpe-desc">No puedes hablar. Esfuerzo total. Solo en intervalos cortos (1-4 min) con recuperación. Solo en Mes 2+ con base construida.</div>
+        <div class="rpe-test">Test: no puedes decir nada inteligible</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FC ZONES -->
+  <div style="margin-top:2.5rem">
+    <div class="section-label" style="margin-bottom:0.5rem">Zonas de FC · Calculadas para ti (30 años)</div>
+
+    <div class="formula-box">
+      <div>
+        <div class="formula">FCmáx = 220 − <span>30</span> = 190 lpm</div>
+        <div class="formula-note">Fórmula estándar para tu edad. Usar esta referencia para calcular todas las zonas.</div>
+      </div>
+      <div class="macy-calc">
+        <div class="calc-result">190 lpm</div>
+        <div class="calc-label">tu FC máxima teórica</div>
+      </div>
+    </div>
+
+    <div class="fc-visual">
+      <div class="fc-zone fc-zone-z1">
+        <div><div class="fc-zone-num">Zona 1</div><div class="fc-zone-name">Recuperación activa</div><div class="fc-zone-detail">Descanso activo, yoga suave, caminar muy suave</div></div>
+        <div style="flex:1"></div>
+        <div class="fc-zone-bpm" style="color:#4ade80">95–114<br><span style="font-size:0.6rem;color:var(--gray)">lpm · 50-60%</span></div>
+      </div>
+      <div class="fc-zone fc-zone-z2">
+        <div>
+          <div class="fc-zone-num">Zona 2 <span class="fc-tag">TU ZONA PRINCIPAL</span></div>
+          <div class="fc-zone-name">Quema de grasa · Mitocondrias</div>
+          <div class="fc-zone-detail">Aquí ocurre la magia: quemas grasa preferentemente, construyes mitocondrias y mejoras la sensibilidad a la insulina. Si puedes conversar, estás aquí.</div>
+        </div>
+        <div style="flex:1"></div>
+        <div class="fc-zone-bpm" style="color:var(--lila)">114–133<br><span style="font-size:0.6rem;color:var(--gray)">lpm · 60-70%</span></div>
+      </div>
+      <div class="fc-zone fc-zone-z3">
+        <div><div class="fc-zone-num">Zona 3</div><div class="fc-zone-name">Umbral aeróbico</div><div class="fc-zone-detail">Puedes hablar poco. Cuestas en hiking. Entra naturalmente en hiking con pendiente.</div></div>
+        <div style="flex:1"></div>
+        <div class="fc-zone-bpm" style="color:#facc15">133–152<br><span style="font-size:0.6rem;color:var(--gray)">lpm · 70-80%</span></div>
+      </div>
+      <div class="fc-zone fc-zone-z4">
+        <div><div class="fc-zone-num">Zona 4</div><div class="fc-zone-name">Umbral anaeróbico</div><div class="fc-zone-detail">Difícil de sostener. Pre-HIIT del Mes 2. Te hace más eficiente metabólicamente.</div></div>
+        <div style="flex:1"></div>
+        <div class="fc-zone-bpm" style="color:#fb923c">152–171<br><span style="font-size:0.6rem;color:var(--gray)">lpm · 80-90%</span></div>
+      </div>
+      <div class="fc-zone fc-zone-z5">
+        <div><div class="fc-zone-num">Zona 5</div><div class="fc-zone-name">Máximo · HIIT</div><div class="fc-zone-detail">Solo en intervalos cortos (1-3 min). Norwegian 4×4 del Mes 3. No ahora.</div></div>
+        <div style="flex:1"></div>
+        <div class="fc-zone-bpm" style="color:#f87171">171–190<br><span style="font-size:0.6rem;color:var(--gray)">lpm · 90-100%</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:1rem" class="infobox">
+      <span class="ib-icon">🩺</span>
+      <div class="ib-text"><strong>Tu objetivo de Mes 1:</strong> mantenerte en Zona 2 (114–133 lpm) el 80% de cada sesión de cardio. Si subes a Z3 no pasa nada — es normal al inicio. Con el tiempo, la misma velocidad te costará menos FC. Ese descenso de FC es tu mejor marcador de progreso metabólico.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ FUERZA A -->
+<section id="fuerza-a">
+  <div class="section-label">03 · entrenamiento de fuerza</div>
+  <h2 class="section-title"><em>Rutina A</em> — Full body<br><span class="pink">énfasis posterior</span></h2>
+  <p class="section-desc">Esta rutina trabaja todo el cuerpo priorizando la cadena posterior (glúteos, isquios, espalda) — el mayor sumidero de glucosa del cuerpo. Se hace lunes y alterna con la B el miércoles.</p>
+
+  <div class="badges-row" style="margin-bottom:1.5rem">
+    <span class="mini-badge mb-dur">⏱ 40-50 min</span>
+    <span class="mini-badge mb-rpe">RPE 5-6</span>
+    <span class="mini-badge mb-fc">FC 120-140 lpm</span>
+    <span class="mini-badge mb-dur">🗓 Lunes</span>
+  </div>
+
+  <div class="routine-section open" id="ra">
+    <div class="routine-header" onclick="toggleRoutine('ra')">
+      <div class="routine-icon icon-fuerza">💪</div>
+      <div class="routine-header-text">
+        <h3>Rutina A — 7 ejercicios · 3 series cada uno</h3>
+        <p>Full body · énfasis cadena posterior · RPE 5-6 · 60-75 seg descanso</p>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="routine-body">
+
+      <div class="protocol-block">
+        <div class="protocol-title">Estructura de la sesión</div>
+        <div class="protocol-steps">
+          <div class="protocol-step"><span class="step-time">0-5 min</span><span>Activación dinámica (ver sección Activación más abajo)</span></div>
+          <div class="protocol-step"><span class="step-time">5-40 min</span><span>7 ejercicios de fuerza · 3 series × 10-15 reps · 60-75 seg descanso entre series</span></div>
+          <div class="protocol-step"><span class="step-time">40-50 min</span><span>Cool-down: caminata 5 min en caminadora + estiramientos 5 min</span></div>
+        </div>
+      </div>
+
+      <ul class="exercise-list">
+        <li class="exercise-item">
+          <div class="ex-num">01</div>
+          <div class="ex-content">
+            <div class="ex-name">Goblet Squat (sentadilla con pelota/peso)</div>
+            <div class="ex-muscles">Cuádriceps · Glúteos · Core · Aductores</div>
+            <div class="ex-how">De pie, pies al ancho de hombros, pies ligeramente abiertos. Sostén la pelota de pilates contra el pecho. Baja hasta que muslos queden paralelos al suelo (o hasta donde puedas sin talón se levante). Rodillas empujan hacia afuera — no hacia adentro. Sube empujando el suelo con los talones. <span class="ex-tip">💡 Si tus talones se levantan, ponles una placa o libro delgado debajo.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 10-12</strong>RPE 5-6<br>60 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">02</div>
+          <div class="ex-content">
+            <div class="ex-name">Hip Thrust con Polainas (1 kg)</div>
+            <div class="ex-muscles">Glúteo mayor · Isquiotibiales · Lumbar baja</div>
+            <div class="ex-how">Recostada boca arriba, hombros apoyados en el sofá/cama. Rodillas flexionadas 90°, pies al ancho de cadera. Polainas en los tobillos. Aprieta glúteos y sube las caderas hasta formar una línea recta hombro-cadera-rodilla. Mantén 1 seg arriba apretando fuerte. Baja lento (3 seg). <span class="ex-tip">💡 El movimiento viene de los glúteos, no de la espalda. Ombligo hacia dentro todo el tiempo.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 12-15</strong>RPE 6<br>60 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">03</div>
+          <div class="ex-content">
+            <div class="ex-name">Push-up Inclinado (manos en pared o superficie alta)</div>
+            <div class="ex-muscles">Pectoral · Tríceps · Deltoides anterior · Core</div>
+            <div class="ex-how">Manos a la altura del pecho en la pared o respaldo de silla firme, más ancho que hombros. Cuerpo en línea recta de cabeza a talones, ombligo activado. Baja el pecho hacia la superficie flexionando los codos (45° hacia el cuerpo, no hacia los lados), sube empujando. Progresión: a menor altura = más difícil. <span class="ex-tip">💡 Si puedes hacer más de 15 con buena técnica, baja la superficie o ve al suelo.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 8-12</strong>RPE 6<br>60 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">04</div>
+          <div class="ex-content">
+            <div class="ex-name">Remo con Banda Anclada (o mochila con libros)</div>
+            <div class="ex-muscles">Dorsal · Romboides · Bíceps · Trapecio medio</div>
+            <div class="ex-how">Ancla la banda en la parte baja de una puerta. De pie o sentada, ligera inclinación hacia adelante (45°), espalda recta. Jala la banda hacia las caderas con los codos pegados al cuerpo. Aprieta las escápulas al final del movimiento — como si quisieras apretar una naranja entre los omóplatos. Regresa lento. <span class="ex-tip">💡 El error más común es usar la espalda baja para jalar — el movimiento debe venir de la espalda alta.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 12</strong>RPE 5-6<br>60 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">05</div>
+          <div class="ex-content">
+            <div class="ex-name">Step-Up al Sofá con Polainas</div>
+            <div class="ex-muscles">Glúteo · Cuádriceps · Equilibrio · Tobillo</div>
+            <div class="ex-how">De pie frente a una silla resistente o escalón. Polainas en tobillos. Sube un pie a la superficie, empuja con ese talón para subir todo el cuerpo. El pie de abajo no empuja — solo acompaña. Baja lento y controlado. Alterna piernas cada repetición. Mantén el torso erecto, no te inclines hacia adelante. <span class="ex-tip">💡 La rodilla de la pierna de trabajo no debe sobrepasar la punta del pie al subir.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 10/pierna</strong>RPE 5-6<br>60 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">06</div>
+          <div class="ex-content">
+            <div class="ex-name">Dead Bug (Bicho Muerto)</div>
+            <div class="ex-muscles">Core profundo · Transverso abdominal · Estabilizadores de columna</div>
+            <div class="ex-how">Recostada boca arriba, brazos extendidos hacia el techo, rodillas a 90° en el aire (como sentada en una silla invisible). Sin mover la espalda baja del suelo, extiende simultáneamente el brazo derecho hacia atrás y la pierna izquierda hacia adelante (casi tocando el suelo). Regresa y cambia. Respira: exhala al extender. <span class="ex-tip">💡 La espalda baja SIEMPRE pegada al suelo. Si se levanta, reduce el rango de movimiento.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 8/lado</strong>RPE 4-5<br>45 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">07</div>
+          <div class="ex-content">
+            <div class="ex-name">Plancha Frontal (Forearm Plank)</div>
+            <div class="ex-muscles">Core completo · Hombros · Glúteos · Cuádriceps</div>
+            <div class="ex-how">Apoyada en antebrazos y puntillas, cuerpo recto de cabeza a talones. Ombligo hacia la columna. Glúteos contraídos. Cabeza en línea neutral — mira el suelo. No dejes que la cadera se hunda ni que suba como una montaña. Respira normalmente. <span class="ex-tip">💡 Si 30 seg es mucho, haz 3×15 seg con 10 seg descanso entre cada uno. El tiempo irá subiendo semana a semana.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 20-40 seg</strong>RPE 5-6<br>45 seg ↓</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ FUERZA B -->
+<section id="fuerza-b">
+  <h2 class="section-title"><em>Rutina B</em> — Full body<br><span class="pink">tracción + unilateral</span></h2>
+  <p class="section-desc">Complementa la A: énfasis en movimientos de tirón, pierna unilateral (más difícil → más músculo) y antirotación de core. Se hace los miércoles.</p>
+
+  <div class="badges-row" style="margin-bottom:1.5rem">
+    <span class="mini-badge mb-dur">⏱ 40-50 min</span>
+    <span class="mini-badge mb-rpe">RPE 5-6</span>
+    <span class="mini-badge mb-fc">FC 115-135 lpm</span>
+    <span class="mini-badge mb-dur">🗓 Miércoles</span>
+  </div>
+
+  <div class="routine-section open" id="rb">
+    <div class="routine-header" onclick="toggleRoutine('rb')">
+      <div class="routine-icon icon-fuerza">🏋️‍♀️</div>
+      <div class="routine-header-text">
+        <h3>Rutina B — 7 ejercicios · 3 series cada uno</h3>
+        <p>Full body · tracción + unilateral · RPE 5-6 · Sem 3: tempo 3-1-1</p>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="routine-body">
+
+      <div class="protocol-block">
+        <div class="protocol-title">Tempo 3-1-1 (entra en Semana 3)</div>
+        <div class="protocol-steps">
+          <div class="protocol-step"><span class="step-time">3 seg</span><span>Fase excéntrica (bajada o alargamiento del músculo) — lento y controlado</span></div>
+          <div class="protocol-step"><span class="step-time">1 seg</span><span>Pausa al final de la bajada — músculo en tensión máxima</span></div>
+          <div class="protocol-step"><span class="step-time">1 seg</span><span>Fase concéntrica (subida o acortamiento) — más explosivo</span></div>
+        </div>
+      </div>
+
+      <ul class="exercise-list">
+        <li class="exercise-item">
+          <div class="ex-num">01</div>
+          <div class="ex-content">
+            <div class="ex-name">Sentadilla Búlgara (Split Squat) con Polainas</div>
+            <div class="ex-muscles">Glúteo mayor · Cuádriceps · Equilibrio · Estabilizadores de cadera</div>
+            <div class="ex-how">De pie de espaldas a una silla. Pon el empeine del pie trasero en el asiento. Pie delantero adelantado suficiente para que la rodilla no sobrepase el pie al bajar. Baja la rodilla trasera hacia el suelo lentamente (3 seg en Sem 3). Sube empujando con el talón del pie delantero. El torso puede inclinarse ligeramente hacia adelante — es normal. <span class="ex-tip">💡 Si pierdes el equilibrio, apóyate con una mano en la pared al inicio.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 8-10/pierna</strong>RPE 6-7<br>75 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">02</div>
+          <div class="ex-content">
+            <div class="ex-name">Peso Muerto Rumano con Banda</div>
+            <div class="ex-muscles">Isquiotibiales · Glúteo mayor · Lumbar · Erector espinal</div>
+            <div class="ex-how">De pie, banda bajo los pies. Pies al ancho de cadera. Agarra la banda a la altura de los muslos. Sin doblar las rodillas exageradamente, inclínate hacia adelante empujando las caderas hacia atrás (como si quisieras cerrar una puerta con el trasero). Mantén la espalda recta y el pecho alto. Baja hasta sentir tensión en la parte trasera de los muslos. Sube apretando glúteos. <span class="ex-tip">💡 La espalda nunca se redondea. Si pierdes la forma, has llegado a tu rango — para ahí.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 10-12</strong>RPE 6<br>60 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">03</div>
+          <div class="ex-content">
+            <div class="ex-name">Y-T-W con Banda (fortalecimiento de espalda alta)</div>
+            <div class="ex-muscles">Trapecio inferior/medio · Romboides · Deltoides posterior</div>
+            <div class="ex-how">De pie, ligera inclinación o de rodillas. Banda en manos. Forma la letra Y: eleva brazos en diagonal arriba (45°). Regresa. Forma T: eleva brazos horizontales a los lados. Regresa. Forma W: codos a 90°, jala hacia atrás apretando escápulas. Movimientos lentos y controlados. <span class="ex-tip">💡 La resistencia debe ser muy ligera — estos músculos son pequeños. La forma importa más que la carga.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 12 Y + 8 T + 8 W</strong>RPE 5<br>45 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">04</div>
+          <div class="ex-content">
+            <div class="ex-name">Press de Hombro con Banda (sentada en pelota)</div>
+            <div class="ex-muscles">Deltoides · Trapecio superior · Tríceps</div>
+            <div class="ex-how">Sentada en la pelota de pilates para activar el core (equilibrio). Banda bajo los pies o anclada. Brazos a 90° a los lados (en L). Empuja hacia arriba hasta casi extender los brazos. Baja lento. La columna no se arquea — core activado todo el tiempo. <span class="ex-tip">💡 En la pelota de pilates activas el core pasivamente mientras entrenas los hombros. Doble trabajo.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 10-12</strong>RPE 5-6<br>60 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">05</div>
+          <div class="ex-content">
+            <div class="ex-name">Glute Bridge a Una Pierna (con Polainas)</div>
+            <div class="ex-muscles">Glúteo mayor · Estabilizadores de cadera · Lumbar</div>
+            <div class="ex-how">Recostada, una pierna extendida en el aire, la otra apoyada. Polainas en ambos tobillos. Sube la cadera usando solo la pierna apoyada. Mantén la pelvis nivelada — sin dejar que un lado caiga. Aprieta el glúteo 1 seg arriba. Baja lento. <span class="ex-tip">💡 Más difícil que el puente normal. Si la cadera cae, regresa al puente bilateral primero.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 10/pierna</strong>RPE 6<br>60 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">06</div>
+          <div class="ex-content">
+            <div class="ex-name">Pallof Press Anti-Rotación con Banda</div>
+            <div class="ex-muscles">Core profundo · Oblicuos · Estabilizadores de columna</div>
+            <div class="ex-how">Ancla la banda a la altura del pecho. De pie de lado a la banda, sepárate hasta que haya tensión. Sostén la banda a 2 manos al pecho. Extiende los brazos al frente lentamente — resiste la rotación que la banda intenta hacer. Mantén 2 seg. Regresa. El poder del ejercicio es en la resistencia, no en el movimiento. <span class="ex-tip">💡 Si el cuerpo se rota o los pies se mueven, estás muy lejos de la banda. Acércate.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 10/lado</strong>RPE 5<br>45 seg ↓</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">07</div>
+          <div class="ex-content">
+            <div class="ex-name">Bird-Dog (Perro Pájaro)</div>
+            <div class="ex-muscles">Core profundo · Erector espinal · Glúteos · Equilibrio</div>
+            <div class="ex-how">En cuatro apoyos (rodillas y manos). Columna neutral — no arqueada ni redondeada. Simultáneamente extiende el brazo derecho al frente y la pierna izquierda hacia atrás, formando una línea recta. Mantén 2 seg. Regresa sin tocar el suelo y repite. El movimiento es lento — no hay que balancearse. <span class="ex-tip">💡 Imagina que tienes un vaso de agua en la espalda baja — no debes derramarlo.</span></div>
+          </div>
+          <div class="ex-badge"><strong>3 × 8/lado</strong>RPE 4-5<br>45 seg ↓</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ CARDIO Z2 -->
+<section id="cardio-z2">
+  <div class="section-label">04 · cardio z2</div>
+  <h2 class="section-title">Cardio <em>Zona 2</em><br><span class="pink">tu arma metabólica</span></h2>
+  <p class="section-desc">La Zona 2 no es "caminar aburrida" — es el protocolo más poderoso que existe para construir mitocondrias, quemar grasa preferentemente y revertir la resistencia a la insulina. Necesitas sentirlo como "difícil pero puedo hablar".</p>
+
+  <div class="infobox" style="margin-bottom:1.5rem">
+    <span class="ib-icon">🔬</span>
+    <div class="ib-text"><strong>¿Por qué Zona 2 para resistencia a la insulina?</strong> En Z2, el músculo usa principalmente grasa como combustible activando el sistema mitocondrial. Con el tiempo, el músculo se vuelve más eficiente captando glucosa (↑ GLUT-4) y más sensible a la insulina. Iñigo San Millán (investigador de UCI) la llama "la intensidad que más mueve la aguja metabólica" en síndrome metabólico.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ CAMINADORA PROTOCOL -->
+<section id="caminadora">
+  <h2 class="section-title">Protocolo <em>caminadora</em><br>paso a paso</h2>
+
+  <div class="routine-section open" id="rc">
+    <div class="routine-header" onclick="toggleRoutine('rc')">
+      <div class="routine-icon icon-cardio">🏃‍♀️</div>
+      <div class="routine-header-text">
+        <h3>Sesión Z2 — Caminadora · Martes y Viernes</h3>
+        <p>FC objetivo: 114–133 lpm · RPE 5-6 · 40-50 min</p>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="routine-body">
+      <div class="caminadora-steps">
+        <div class="cam-step">
+          <div class="cam-step-line"><div class="cam-dot"></div><div class="cam-line"></div></div>
+          <div class="cam-content">
+            <div class="cam-time">0:00 – 5:00 min</div>
+            <div class="cam-label">Calentamiento — Velocidad baja, sin inclinación</div>
+            <div class="cam-detail">Velocidad: 3.5–4 km/h · Inclinación: 0% · FC objetivo: 95–110 lpm<br>Deja que el cuerpo entre en ritmo. Respira por la nariz. Escanea tu postura: hombros abajo y atrás, core leve, mirada al frente.</div>
+          </div>
+        </div>
+        <div class="cam-step">
+          <div class="cam-step-line"><div class="cam-dot active"></div><div class="cam-line"></div></div>
+          <div class="cam-content">
+            <div class="cam-time">5:00 – 10:00 min</div>
+            <div class="cam-label">Entrada a Zona 2 — Sube inclinación</div>
+            <div class="cam-detail">Velocidad: 4.5–5 km/h · Inclinación: 3–5% · FC objetivo: 110–125 lpm<br>Aquí empieza el trabajo real. Si tu FC no llega a 114, sube la inclinación 1%. Si supera 133, baja la velocidad o la inclinación.</div>
+          </div>
+        </div>
+        <div class="cam-step">
+          <div class="cam-step-line"><div class="cam-dot active"></div><div class="cam-line"></div></div>
+          <div class="cam-content">
+            <div class="cam-time">10:00 – 35:00 min</div>
+            <div class="cam-label">⚡ Zona 2 estable — El corazón de la sesión</div>
+            <div class="cam-detail">Velocidad: 5–5.5 km/h · Inclinación: 5–7% · FC objetivo: <strong style="color:var(--lila)">114–133 lpm</strong><br>Test de conversación cada 5 min: ¿puedes decir una oración de 10 palabras sin cortar? Si sí = perfecto. Si no = baja la velocidad. Ajusta inclinación para mantener FC en rango. No te agarres de la barra (reduce eficiencia hasta 30%).</div>
+          </div>
+        </div>
+        <div class="cam-step">
+          <div class="cam-step-line"><div class="cam-dot"></div><div class="cam-line"></div></div>
+          <div class="cam-content">
+            <div class="cam-time">35:00 – 40:00 min</div>
+            <div class="cam-label">Activación final de glúteos (Vie/Mar)</div>
+            <div class="cam-detail">Solo en días de viernes o cuando tengas energía extra. Mantén velocidad pero añade 3 min de inclinación máxima (8-10%) a FC hasta 130. Baja a 3% los últimos 2 min.</div>
+          </div>
+        </div>
+        <div class="cam-step">
+          <div class="cam-step-line"><div class="cam-dot"></div></div>
+          <div class="cam-content">
+            <div class="cam-time">40:00 – 45:00 min</div>
+            <div class="cam-label">Cool-down — Recuperación activa</div>
+            <div class="cam-detail">Velocidad: 3.5 km/h · Inclinación: 0% · FC objetivo: bajar a <90 lpm<br>No pares de golpe. La recuperación gradual evita mareo y ayuda a limpiar el lactato. Respira profundo. Aprovecha para hacer un body scan de cómo se siente el cuerpo.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-title">📏 Tu marcador de progreso de Zona 2</div>
+        <div class="protocol-steps">
+          <div class="protocol-step"><span class="step-time">Semana 1</span><span>Anota tu FC al minuto 20 a 5km/h, 5% inclinación</span></div>
+          <div class="protocol-step"><span class="step-time">Semana 4</span><span>Repite exactamente las mismas condiciones</span></div>
+          <div class="protocol-step"><span class="step-time">Resultado</span><span>Si tu FC bajó 5-10 lpm en las mismas condiciones = tus mitocondrias mejoraron y la resistencia a la insulina está respondiendo</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ YOGA PILATES -->
+<section id="yoga-pilates">
+  <div class="section-label">05 · yoga & pilates</div>
+  <h2 class="section-title">Yoga & <em>Pilates</em><br><span class="pink">el jueves es tuyo</span></h2>
+  <p class="section-desc">Los jueves son para el sistema nervioso, la movilidad y el core profundo. Pilates de suelo con polainas y yoga activan músculos estabilizadores que el cardio y la fuerza no tocan — y bajan el cortisol.</p>
+
+  <div class="routine-section" id="ryp">
+    <div class="routine-header" onclick="toggleRoutine('ryp')">
+      <div class="routine-icon icon-yoga">🧘‍♀️</div>
+      <div class="routine-header-text">
+        <h3>Sesión Jueves — Yoga Vinyasa + Pilates de Suelo</h3>
+        <p>30-40 min · RPE 3-5 · FC 95-115 lpm · Sistema nervioso parasimpático</p>
+      </div>
+      <span class="chevron">▾</span>
+    </div>
+    <div class="routine-body">
+      <div class="protocol-block">
+        <div class="protocol-title">Secuencia tipo</div>
+        <div class="protocol-steps">
+          <div class="protocol-step"><span class="step-time">0-8 min</span><span>Saludo al sol A × 3-5 repeticiones — activa todo el cuerpo de forma fluida</span></div>
+          <div class="protocol-step"><span class="step-time">8-20 min</span><span>Guerrero I, II, III · Triángulo · Media luna (equilibrio) · Perro boca abajo</span></div>
+          <div class="protocol-step"><span class="step-time">20-30 min</span><span>Pilates de suelo con polainas: El cien, tijeras, puente, side kick, roll-up suave</span></div>
+          <div class="protocol-step"><span class="step-time">30-40 min</span><span>Yin yoga: paloma, mariposa, postura infantil — 3-5 min por postura</span></div>
+        </div>
+      </div>
+      <ul class="exercise-list">
+        <li class="exercise-item">
+          <div class="ex-num">P1</div>
+          <div class="ex-content">
+            <div class="ex-name">El Cien (The Hundred) — Pilates clásico</div>
+            <div class="ex-muscles">Transverso abdominal · Recto abdominal · Cadera flexora</div>
+            <div class="ex-how">Recostada. Levanta las piernas a 45° (o 90° si te cuesta). Eleva la cabeza y hombros del suelo. Brazos extendidos a los costados, pulsando 5 veces mientras inhalas y 5 mientras exhalas. Cuenta hasta 100 (10 ciclos). <span class="ex-tip">💡 Si el cuello duele, apoya la cabeza. La magia está en el core, no en el cuello.</span></div>
+          </div>
+          <div class="ex-badge"><strong>100 pulsos</strong>RPE 4-5<br>Core activo</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">P2</div>
+          <div class="ex-content">
+            <div class="ex-name">Tijeras (Single Leg Stretch)</div>
+            <div class="ex-muscles">Core · Cadera flexora · Coordinación</div>
+            <div class="ex-how">Recostada, ambas piernas al aire. Lleva rodilla al pecho, manos en espinilla. La otra pierna extendida. Alterna. Inhala 2 cambios, exhala 2 cambios. Con polainas = más demanda en cuádriceps e isquios.</div>
+          </div>
+          <div class="ex-badge"><strong>3 × 10/lado</strong>RPE 4-5<br>Polainas 1kg</div>
+        </li>
+        <li class="exercise-item">
+          <div class="ex-num">P3</div>
+          <div class="ex-content">
+            <div class="ex-name">Side Kick con Polainas</div>
+            <div class="ex-muscles">Abductor · Glúteo medio · Estabilizadores de cadera</div>
+            <div class="ex-how">Acostada de lado, pierna de arriba. Lleva la pierna al frente 45°, regresa y ve hacia atrás 20°. Mantén la cadera estable — no osciles. 15 repeticiones y cambia de lado. Con polainas la intensidad sube considerablemente.</div>
+          </div>
+          <div class="ex-badge"><strong>3 × 15/lado</strong>RPE 5<br>Polainas 1kg</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ ACTIVACIÓN -->
+<section id="activacion">
+  <div class="section-label">06 · preparación</div>
+  <h2 class="section-title">Activación <em>dinámica</em><br><span class="pink">los primeros 5 minutos</span></h2>
+  <p class="section-desc">Nunca empieces una sesión de fuerza en frío. 5 minutos de activación dinámica preparan articulaciones, activan el sistema nervioso y reducen lesiones. Es diferente al estiramiento estático (que va al final).</p>
+
+  <div class="stretch-grid">
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🔄</span><div><div class="sc-name">Círculos de cadera</div><div class="sc-zone">Cadera · Lumbar · Movilidad</div></div></div>
+      <div class="sc-steps">De pie, manos en caderas. Dibuja círculos grandes con las caderas: 10 en un sentido, 10 en el otro. Amplía el rango progresivamente. Rodillas ligeramente flexionadas.</div>
+      <div class="sc-time">⏱ 30 seg cada sentido</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🦵</span><div><div class="sc-name">Estocadas laterales</div><div class="sc-zone">Aductores · Glúteos · Rodilla</div></div></div>
+      <div class="sc-steps">De pie, da un paso lateral grande. Dobla la rodilla del lado que pisas, la otra pierna estirada. Regresa. Alterna. Ve aumentando la amplitud. El pie siempre al frente, no rotado.</div>
+      <div class="sc-time">⏱ 10 cada lado</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🐈</span><div><div class="sc-name">Gato-Vaca dinámica</div><div class="sc-zone">Columna completa · Lumbar · Cervical</div></div></div>
+      <div class="sc-steps">En cuatro apoyos. Redondea toda la columna (gato: ombligo al techo, cabeza abajo). Luego arquea (vaca: pecho adelante, cadera arriba). Alterna fluidamente. Inhala en vaca, exhala en gato.</div>
+      <div class="sc-time">⏱ 10 ciclos lentos</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🦋</span><div><div class="sc-name">Hip hinge con brazos</div><div class="sc-zone">Isquios · Glúteos · Espalda baja</div></div></div>
+      <div class="sc-steps">De pie. Empuja las caderas hacia atrás con espalda recta (como en peso muerto). Brazos al frente para contrapeso. Siente el estiramiento en la parte trasera de los muslos. Regresa apretando glúteos.</div>
+      <div class="sc-time">⏱ 10 repeticiones</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🚶</span><div><div class="sc-name">Marcha de glúteos</div><div class="sc-zone">Glúteo medio · Cadera · Activación</div></div></div>
+      <div class="sc-steps">De pie. Levanta la rodilla al pecho y llévala afuera (abducción de cadera). Baja. Alterna piernas como si marcharas pero con la rodilla saliendo al exterior. Activa el glúteo medio — el más olvidado.</div>
+      <div class="sc-time">⏱ 10 cada lado</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">💫</span><div><div class="sc-name">Rotaciones torácicas</div><div class="sc-zone">Columna torácica · Hombros · Costillas</div></div></div>
+      <div class="sc-steps">En cuatro apoyos. Mano detrás de la cabeza. Rota el codo hacia el techo siguiendo con la mirada. Regresa y cruza el codo por debajo del otro brazo. Mueve solo la parte alta de la espalda — la baja no se mueve.</div>
+      <div class="sc-time">⏱ 8 cada lado</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ ESTIRAMIENTOS -->
+<section id="estiramientos">
+  <div class="section-label">07 · cooldown</div>
+  <h2 class="section-title"><em>Estiramientos</em><br><span class="pink">los últimos 8-10 minutos</span></h2>
+  <p class="section-desc">El estiramiento estático (mantener la posición) va DESPUÉS del ejercicio — nunca antes. Es cuando el músculo está caliente y la flexibilidad mejora sin riesgo. Mantén cada posición mínimo 30-45 segundos respirando profundo.</p>
+
+  <div class="stretch-grid">
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🕊️</span><div><div class="sc-name">Paloma (Pigeon Pose)</div><div class="sc-zone">Glúteo · Piriforme · Cadera</div></div></div>
+      <div class="sc-steps">En el suelo, rodilla derecha adelante a 90°, pierna izquierda extendida atrás. Inclínate hacia adelante sobre la espinilla delantera. Sientes el glúteo y la cadera abrirse. Respira hacia donde sientes la tensión.</div>
+      <div class="sc-time">⏱ 45-60 seg cada lado</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🏹</span><div><div class="sc-name">Estocada baja (Lunge)</div><div class="sc-zone">Flexor de cadera · Cuádriceps · Psoas</div></div></div>
+      <div class="sc-steps">Rodilla trasera en el suelo, rodilla delantera a 90°. Empuja las caderas hacia adelante suavemente hasta sentir el estiramiento en la parte delantera del muslo trasero. Manos en la cintura, espalda recta. Esencial si estás sentada horas.</div>
+      <div class="sc-time">⏱ 45 seg cada lado</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🧲</span><div><div class="sc-name">Estiramiento de isquios tumbada</div><div class="sc-zone">Isquiotibiales · Nervio ciático</div></div></div>
+      <div class="sc-steps">Recostada. Lleva una pierna hacia el techo con banda, cinturón o toalla en el pie. Mantén la otra pierna en el suelo. No fuerces — respira y en cada exhalación cede un poco más. Rodilla ligeramente flexionada si duele mucho.</div>
+      <div class="sc-time">⏱ 45 seg cada lado</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🌊</span><div><div class="sc-name">Puente con apertura (Reclined Butterfly)</div><div class="sc-zone">Aductores · Cadera interna · Relajación</div></div></div>
+      <div class="sc-steps">Recostada. Planta de los pies juntas, rodillas abiertas hacia los lados como mariposa. Deja que la gravedad abra las caderas. Sin forzar — solo deja caer. Coloca las manos en el abdomen y respira profundo.</div>
+      <div class="sc-time">⏱ 60-90 seg</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🤸</span><div><div class="sc-name">Thread the Needle (Aguja)</div><div class="sc-zone">Columna torácica · Hombros · Romboides</div></div></div>
+      <div class="sc-steps">En cuatro apoyos. Pasa el brazo derecho por debajo del otro, llevando el hombro y mejilla al suelo. El brazo izquierdo puede estirar al frente. Sientes la rotación en la espalda alta. Ideal para el "dolor de espalda de escritorio".</div>
+      <div class="sc-time">⏱ 40 seg cada lado</div>
+    </div>
+    <div class="stretch-card">
+      <div class="sc-header"><span class="sc-icon">🌙</span><div><div class="sc-name">Postura infantil (Child's Pose)</div><div class="sc-zone">Lumbar · Cadera · Sistema nervioso</div></div></div>
+      <div class="sc-steps">De rodillas, siéntate sobre los talones y estira los brazos al frente en el suelo. La frente toca el piso o una almohada. Respiración lenta y profunda — este movimiento activa el nervio vago y baja el cortisol. El mejor cierre de sesión.</div>
+      <div class="sc-time">⏱ 60-90 seg</div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem" class="infobox">
+    <span class="ib-icon">🌸</span>
+    <div class="ib-text"><strong>Para la movilidad de columna</strong> (muy importante para sedentarias): añade la <strong>Torsión Supina</strong> — recostada, lleva una rodilla al lado opuesto y extiende el brazo contrario. 45 seg × 2 lados. Esta postura alivia la tensión lumbar acumulada por el trabajo frente a la pantalla.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ PAUSAS ACTIVAS -->
+<section id="pausas">
+  <div class="section-label">08 · trabajo desde casa</div>
+  <h2 class="section-title">Pausas <em>activas</em><br><span class="pink">cada 50 minutos</span></h2>
+  <p class="section-desc">El sedentarismo crónico eleva la glucosa y la insulina independientemente de cuánto ejercites. Cada 50 min de trabajo, tómate 5 de movimiento. Estos mini-rituales reducen el pico de glucosa postprandial hasta un 30% adicional.</p>
+
+  <div class="soleus-box">
+    <span class="sb-icon">🦵</span>
+    <div class="sb-content">
+      <div class="sb-title">El Soleus Push-Up — tu superpoder metabólico sentada</div>
+      <div class="sb-text">El músculo sóleo (gemelo profundo) tiene la capacidad única de activar el metabolismo de glucosa e insulina sin mover el resto del cuerpo. Un estudio de 2022 (Hamilton, Nature Metabolism) demostró que este simple movimiento reduce glucosa postprandial 52% y la insulina 60% si se hace durante 270 minutos continuos.</div>
+      <div class="sb-how"><strong style="color:var(--lila-pale)">Cómo hacerlo:</strong> Sentada en tu silla. Planta del pie plana en el suelo. Levanta el talón despacio mientras los dedos se quedan en el suelo. Baja el talón. Repite en un ritmo continuo y relajado. <strong>No es un ejercicio de velocidad</strong> — es un movimiento lento y constante. Hazlo mientras trabajas, en llamadas, viendo una serie. Alterna pies.</div>
+    </div>
+  </div>
+
+  <div class="pausa-grid">
+    <div class="pausa-card">
+      <div class="pc-icon">🏋️‍♀️</div>
+      <div class="pc-name">Mini-circuito de fuerza</div>
+      <div class="pc-time">⏱ 5 min cada 50 min de trabajo</div>
+      <div class="pc-steps">10 sentadillas al borde de la silla · 10 puentes glúteos en el piso · 10 push-up en pared · 10 remo con banda · 30 seg plancha. Sin descanso entre ejercicios.</div>
+    </div>
+    <div class="pausa-card">
+      <div class="pc-icon">🚶</div>
+      <div class="pc-name">Caminata + micro-cardio</div>
+      <div class="pc-time">⏱ 3-5 min caminando</div>
+      <div class="pc-steps">Camina por la casa, sube y baja escaleras × 3, da una vuelta al jardín o terraza. Después: 20 sentadillas explosivas (no saltar, solo rápido) para activar GLUT-4 en músculo.</div>
+    </div>
+    <div class="pausa-card">
+      <div class="pc-icon">🤸‍♀️</div>
+      <div class="pc-name">Reset postural</div>
+      <div class="pc-time">⏱ 3-4 min</div>
+      <div class="pc-steps">Para la tensión de estar encorvada: Wall angel × 10 · Pull-apart con banda × 15 · Rotaciones cervicales lentas × 5/lado · Stretch de pectoral en marco de puerta 30 seg. Contrarresta la postura de escritorio.</div>
+    </div>
+    <div class="pausa-card">
+      <div class="pc-icon">🌬️</div>
+      <div class="pc-name">Reset de estrés</div>
+      <div class="pc-time">⏱ 5 min (pausa de mediodía)</div>
+      <div class="pc-steps">Suspiro fisiológico cíclico × 5 (doble inhalación nasal + exhalación larga oral) · Meditación de 3 min con Insight Timer · Escaneo corporal: ¿dónde tengo tensión? Suéltala conscientemente.</div>
+    </div>
+    <div class="pausa-card">
+      <div class="pc-icon">🦋</div>
+      <div class="pc-name">Movilidad de cadera</div>
+      <div class="pc-time">⏱ 4 min</div>
+      <div class="pc-steps">90-90 hip stretch (2 min) · Mariposa sentada (1 min) · Círculos de tobillo × 10 cada lado · Estiramiento de cuádriceps de pie × 30 seg cada lado. Para el acortamiento de flexores de cadera por estar sentada.</div>
+    </div>
+    <div class="pausa-card">
+      <div class="pc-icon">💃</div>
+      <div class="pc-name">Movimiento libre</div>
+      <div class="pc-time">⏱ 3-5 min</div>
+      <div class="pc-steps">Pon una canción que te encante. Muévete como quieras — sacude los hombros, baila, estira los brazos. El movimiento espontáneo activa la dopamina y reduce la fatiga cognitiva. Sin reglas, solo fluir.</div>
+    </div>
+  </div>
+
+  <div class="infobox" style="margin-top:1rem">
+    <span class="ib-icon">📱</span>
+    <div class="ib-text"><strong>App recomendada para pausas:</strong> pon un timer de 50 min en tu teléfono o usa la función Pomodoro (25/5 min). Cuando suene → pausa obligatoria. <strong>El truco:</strong> pon la resistencia de saltar lo más baja posible — levantarte 30 seg es suficiente para romper el ciclo de insulina elevada por sedentarismo.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ PROGRESION -->
+<section>
+  <div class="section-label">09 · progresión mensual</div>
+  <h2 class="section-title">Cómo <em>progresar</em><br><span class="pink">sin lesionarte</span></h2>
+
+  <div style="display:flex;flex-direction:column;gap:0.8rem">
+    <div class="card" style="border-left:3px solid var(--lila)">
+      <div class="section-label" style="margin-bottom:0.5rem;font-size:0.6rem">Semanas 1-2 · Adaptación</div>
+      <p style="font-size:0.83rem;color:var(--gray);line-height:1.6">RPE 5-6 en todo. Polainas 1kg. 3 series con 75 seg de descanso. No hay que "sentir" que te estás muriendo — el músculo se adapta neuralmente antes de crecer. Enfócate en la técnica perfecta en cada ejercicio.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--lila-mid)">
+      <div class="section-label" style="margin-bottom:0.5rem;font-size:0.6rem">Semanas 3-4 · Consolidación</div>
+      <p style="font-size:0.83rem;color:var(--gray);line-height:1.6">RPE 6-7 en fuerza. Tempo 3-1-1 en ejercicios principales. Reduce descanso a 60 seg. Polainas se mantienen en 1kg — la progresión es técnica, no solo peso. El cardio Z2 sube a 45 min.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--pink)">
+      <div class="section-label" style="margin-bottom:0.5rem;font-size:0.6rem">Mes 2 · Intensificación</div>
+      <p style="font-size:0.83rem;color:var(--gray);line-height:1.6">Polainas 2kg. Pre-HIIT: 8 ciclos 1min/80% + 2min descanso (1 día/semana). Cuerda de saltar entra: 5 ciclos 30seg/60seg descanso. Hiking sube a 75-90 min. Ventana alimentaria 14:10.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:1.2rem" class="infobox">
+    <span class="ib-icon">⚠️</span>
+    <div class="ib-text"><strong>Señales de sobreentrenamiento</strong> — si las notas, reduce volumen 40%: FC de reposo aumenta más de 5 lpm, no recuperas entre sesiones, rendimiento cae, humor irritable, sueño peor. El descanso es donde el músculo crece. No hay mérito en entrenar con dolor.</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="ft-title">macy.eg</div>
+  <div>Plan de transformación metabólica · Mes 1 · 2026</div>
+  <div style="margin-top:0.5rem;opacity:0.5">// no eres el mismo cuerpo que hace 4 semanas //</div>
+</footer>
+
+<button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+function toggleRoutine(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// Nav active state on scroll
+const sections = document.querySelectorAll('section[id], section');
+const pills = document.querySelectorAll('.nav-pill');
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      pills.forEach(p => {
+        p.classList.toggle('active', p.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
